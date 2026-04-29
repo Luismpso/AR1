@@ -10,7 +10,7 @@
 
 > **Aprendizagem por Reforço** | Mestrado em Inteligência Artificial | Universidade do Minho | 2025/26
 
-Portfolio completo das Práticas Laboratoriais (PL1–PL9) de Aprendizagem por Reforço — inclui 5 ambientes, 17+ algoritmos (tabular, aproximação de função, policy gradient, self-play e planeamento model-based), 14 scripts executáveis e modo interativo para jogar contra os agentes treinados.
+Portfolio completo das Práticas Laboratoriais (PL1–PL9) de Aprendizagem por Reforço — inclui 5 ambientes, 18+ algoritmos (tabular, aproximação de função, policy gradient, self-play e planeamento model-based), 15 scripts executáveis e modo interativo para jogar contra os agentes treinados.
 
 ---
 
@@ -33,7 +33,7 @@ Portfolio completo das Práticas Laboratoriais (PL1–PL9) de Aprendizagem por R
 | **Bandits** | ε-Greedy, Decaying ε, UCB, Gradient, Thompson Sampling, Exp3 | `agents/bandits/` |
 | **Dynamic Programming** | Policy Evaluation, Value Iteration, Policy Iteration | `agents/dp/` |
 | **Prediction** | First-Visit Monte Carlo, TD(0), TD(n) | `agents/prediction/` |
-| **Tabular Control** | SARSA, n-step SARSA, MC Control, Q-Learning | `agents/control/` |
+| **Tabular Control** | SARSA, n-step SARSA, MC Control, Q-Learning | `agents/control/` (`q_learning.py`, `sarsa.py`, …) |
 | **Function Approximation** | Linear SARSA (NumPy), Torch SARSA (PyTorch) | `agents/control/` |
 | **Policy Gradient** | REINFORCE (Monte Carlo policy gradient, entropy reg.) | `agents/control/reinforce.py` |
 | **Model-Based Planning** | MCTS (UCB1 selection, random rollout, backup) | `agents/planning/mcts.py` |
@@ -101,12 +101,12 @@ AR1/
 │   ├── reinforce_tictactoe.py  #   PL8: Self-play, vs-random, avaliação REINFORCE
 │   └── mcts_tictactoe.py       #   PL9: MCTS vs Random, vs REINFORCE, vs MCTS
 │
-├── scripts/                    # Scripts executáveis (14 experiências)
+├── scripts/                    # Scripts executáveis (15 experiências)
 │   ├── run_bandits.py              #   PL1: Comparação de 6 algoritmos de bandits
 │   ├── run_gridworld.py            #   PL2/PL3: Policy Eval, Value Iter, Policy Iter
 │   ├── run_car_rental.py           #   PL3: Jack's Car Rental
-│   ├── run_blackjack_prediction.py #   PL4: Predição MC vs TD(0)
-│   ├── run_windy_gridworld_*.py    #   PL5/PL6: SARSA, n-step, MC, Linear, Torch
+│   ├── run_blackjack_prediction.py #   PL4: MC vs TD(0) vs TD(n) + RMSE vs V*
+│   ├── run_windy_gridworld_*.py    #   PL5/PL6: SARSA, n-step, MC, Q-Learning, Linear, Torch
 │   ├── run_tictactoe.py            #   PL6/PL7: SARSA vs Q-Learning + modo interativo
 │   ├── run_reinforce_tictactoe.py  #   PL8: REINFORCE policy gradient + modo interativo
 │   └── run_mcts_tictactoe.py       #   PL9: MCTS vs Random / REINFORCE / MCTS + modo interativo
@@ -155,9 +155,14 @@ AR1/
 ### Instalação
 
 ```bash
+# Recomendado — replica o ambiente exato:
+pip install -r requirements.txt
+
+# Mínimo — só os scripts não-Torch:
 pip install numpy matplotlib
-# Opcional:
-pip install torch
+
+# Opcional (apenas para PL6 Torch SARSA e notebooks):
+pip install torch jupyter
 ```
 
 ### Executar Experiências
@@ -185,6 +190,9 @@ python -m AR1.scripts.run_windy_gridworld_comparison --no-show
 python -m AR1.scripts.run_windy_gridworld_linear_td --no-show
 python -m AR1.scripts.run_windy_gridworld_linear_sarsa --no-show
 python -m AR1.scripts.run_windy_gridworld_torch_sarsa --no-show
+
+# PL5: Windy Gridworld — Q-Learning (off-policy, comparável ao SARSA)
+python -m AR1.scripts.run_windy_gridworld_q_learning --no-show
 
 # PL6/PL7: Tic-Tac-Toe — SARSA vs Q-Learning
 python -m AR1.scripts.run_tictactoe --no-show

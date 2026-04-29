@@ -1,0 +1,12 @@
+# Core scientific stack — required for every script.
+numpy>=1.24
+matplotlib>=3.7
+
+# Optional: only needed for PL6 Torch SARSA (run_windy_gridworld_torch_sarsa.py).
+# Comment out if you don't plan to run the PyTorch agent.
+torch>=2.0
+
+# Optional: only needed if you want to open notebooks/tictactoe.ipynb.
+# Comment out for a leaner install.
+jupyter>=1.0
+ipykernel>=6.0
