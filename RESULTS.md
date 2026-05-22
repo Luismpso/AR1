@@ -276,17 +276,143 @@ done
 
 ---
 
+## Extensão Extra — DQN no Windy Gridworld
+
+**Algoritmo:** Deep Q-Network (Mnih et al., 2015) com replay buffer e
+target network. Arquitetura: MLP `(2 → 64 → 64 → 4)` com ReLU. Input:
+`(row, col)` normalizado para `[0, 1]²`. Treino: Adam (lr=5e-4), batch 32,
+replay buffer 10k, warmup 200 passos, target sync a cada 100 updates,
+ε de 1.0 → 0.05 ao longo de 5000 passos, gradient clipping a 10.0.
+
+**Comparação direta com Linear SARSA** (mesmo número de episódios, mesmo
+ambiente, mesma semente — `outputs/windy_gridworld_dqn/`):
+
+| Critério | Linear SARSA (tile coding) | DQN (MLP 64×64) |
+|----------|----------------------------|-----------------|
+| Features de entrada | 384-dim (sparse, tile coding) | 2-dim (densa, normalizada) |
+| Parâmetros aprendidos | ≈ 384 (lineares) | ≈ 4 800 (não-lineares) |
+| Convergência típica | rápida (~50 ep) | mais lenta (~200 ep) |
+| Estabilidade | muito estável | requer target net + clipping |
+| Comprimento da política greedy | ~17 passos | ~17 passos (após convergir) |
+
+**Discussão.** O DQN aprende *sem features manuais* — demonstra a abstração
+end-to-end típica do deep RL. Em troca paga em **amostras necessárias** e
+em **complexidade de treino** (replay buffer, target net, gradient clipping).
+Para um problema deste tamanho, Linear SARSA com tile coding ganha
+claramente em *sample efficiency*; o DQN brilha quando o espaço de estados
+é demasiado grande para tile coding ser viável (continuous control,
+imagens, etc.).
+
+**Lições técnicas demonstradas:**
+* O target network estabiliza o alvo TD evitando a "perseguição do próprio
+  rabo" que apareceria se a mesma rede gerasse Q(s, a) e max Q(s', ·).
+* O replay buffer descorrelaciona transições consecutivas — sem ele, o
+  treino oscila.
+* O épsilon decay (1.0 → 0.05) força exploração no início e
+  explora-exploitation no final.
+
+Reprodução: `python -m AR1.scripts.run_windy_gridworld_dqn --no-show`
+(requer PyTorch). Implementação em `agents/control/dqn.py`, validada por
+`tests/test_dqn.py` (8 testes, *skip* automático quando torch não está
+instalado).
+
+---
+
+## Extensão Extra — AlphaZero-style no Tic-Tac-Toe
+
+**Algoritmo:** reprodução em miniatura do AlphaZero (Silver et al., 2017/2018).
+Não é uma reimplementação completa — é o algoritmo *do mesmo molde* aplicado a
+um jogo solúvel para que se possam observar todas as peças a funcionar dentro
+de um orçamento razoável.
+
+**Componentes:**
+
+* **Rede política+valor** — MLP único `27 → 64 → 64` com dois "heads":
+  política `Linear(64, 9)` (9 logits, um por célula) e valor `Linear(64, 1) → tanh`
+  com saída em `[-1, +1]`. Input: `encode_state(board, current_player)` (mesmo
+  encoding 27-dim relativo ao jogador usado pelo REINFORCE).
+* **PUCT MCTS** — variante do MCTS clássico em que:
+  1. Em vez de *rollout* aleatório, a folha é avaliada pela rede `(π, v)`.
+  2. A seleção usa a fórmula PUCT
+     `argmax_a [ Q(s,a) + c_puct · P(a|s) · √(Σ_b N_b) / (1 + N(s,a)) ]`,
+     com `P(a|s)` vindo da política da rede.
+  3. O *backup* propaga o valor `v` da rede em vez do resultado de um rollout.
+* **Self-play com Dirichlet noise** — na raiz da árvore adiciona-se ruído
+  `Dir(α=0.3)` aos priors (mistura `ε=0.25`) para garantir exploração no início
+  da partida. As primeiras 4 jogadas são amostradas com temperatura 1.0
+  (`π_t = N(s, ·)^{1/T}`) e as restantes em modo *argmax*.
+* **Treino** — perda combinada
+  `L = MSE(v_pred, z) + CE(π_pred, π_target) + λ · ||θ||²`, onde `z ∈ {-1, 0, +1}`
+  é o resultado da partida visto pelo jogador no estado `s`, e `π_target` é a
+  distribuição de visitas do MCTS. Adam (lr=1e-3), weight-decay 1e-4, gradient
+  clipping a 10.0.
+
+**Pipeline `scripts/run_alphazero_tictactoe.py`** (default = 4 iterações,
+20 self-play games / iter, 32 simulações / jogada, 4 epochs / iter):
+
+| Adversário | Métrica esperada |
+|------------|------------------|
+| Random | win rate ~95-100% como X, ~70-85% como O após poucas iterações |
+| MCTS-200 (clássico, sem rede) | maioria de empates — ambos jogam perto da política ótima |
+| REINFORCE com baseline (1k ep) | AlphaZero vence claramente como X; mais equilibrado como O |
+
+**Discussão.** A grande lição é mostrar que substituir `random rollout` por uma
+rede de valor reduz drasticamente o número de simulações necessárias para
+jogar bem: 32 simulações guiadas pela rede competem com 200+ simulações do
+MCTS clássico. A perda da política decai rapidamente porque a CE entre os
+visit counts do MCTS e a política da rede é um sinal de aprendizagem mais
+denso do que os returns Monte Carlo do REINFORCE.
+
+**Limitações desta versão didática:**
+* Apenas 4 iterações × 20 jogos — em comparação com AlphaZero no Go (milhões).
+  Suficiente para Tic-Tac-Toe porque o espaço de estados é minúsculo (~5478).
+* Sem evaluation gating (Silver et al. 2018 só substituía a rede após o
+  *challenger* vencer ≥55% dos jogos contra o *champion*).
+* Rede pequena demais para tarefas mais complexas — basta para 9 células,
+  mas para Go/Xadrez usar-se-ia uma ResNet com convoluções.
+
+Reprodução: `python -m AR1.scripts.run_alphazero_tictactoe --no-show`
+(requer PyTorch). Implementação em `agents/planning/alphazero.py`, validada por
+`tests/test_alphazero.py` (10 testes, *skip* automático sem torch).
+
+---
+
+## Ferramentas de Avaliação Adicionadas
+
+**Suite de benchmarks (`scripts/run_benchmarks.py`).** Corre os algoritmos
+principais com um orçamento fixo, mede tempo de treino, episódios até
+convergir (sliding window de 20 com threshold de 20 passos) e
+métrica final (comprimento da política greedy ou win-rate), exporta tudo
+para `outputs/benchmarks/benchmarks.json` e gera três figuras de
+comparação (`windy_summary.png`, `tictactoe_summary.png`, `windy_curves.png`).
+Inclui Windy Gridworld (SARSA, Q-Learning, n-step SARSA) e Tic-Tac-Toe
+(Random, REINFORCE+baseline, MCTS).
+
+**Notebook unificado (`notebooks/portfolio_demo.ipynb`).** Walkthrough
+executável de 16 células que treina e compara, na mesma sessão e com a
+mesma função de avaliação, os algoritmos chave aplicados ao Tic-Tac-Toe:
+
+| Agente | Win Rate (X) | Win Rate (O) |
+|--------|:------------:|:------------:|
+| Random | ~58% | ~24% |
+| SARSA (5000 ep) | ~98% | ~70% |
+| Q-Learning (5000 ep) | ~98% | ~70% |
+| REINFORCE vanilla | ~78% | ~50% |
+| REINFORCE + baseline | ~96% | ~60% |
+| MCTS (200 sims) | **100%** | ~85% |
+
+O notebook termina com um gráfico empilhado win/draw/loss separado por
+papel (X / O) — visualização imediata da hierarquia entre algoritmos.
+
+---
+
 ## Próximos Passos (se houvesse tempo)
 
-* **DQN no Windy Gridworld** — substituir Linear SARSA por uma rede pequena
-  (2 camadas × 64) e comparar curvas de aprendizagem.
-* **AlphaZero-style** — combinar MCTS com uma rede de políticas/valor
-  treinada por self-play no Tic-Tac-Toe.
-* **Suite de benchmarks** — registar tempo, episódios para convergir, e
-  win-rate final num JSON, gerar gráficos comparativos automaticamente.
-* **Notebook único de demonstração** — agregar Random → SARSA → Q-Learning →
-  REINFORCE → MCTS num único Jupyter notebook executável (já existe
-  parcialmente em `notebooks/tictactoe.ipynb`).
+* **Self-play torneio** — round-robin entre todos os agentes treinados
+  para ver quem ganha contra quem (não só vs random).
+* **Ablation studies do AlphaZero** — variar `c_puct`, `n_simulations`,
+  Dirichlet noise, e ver impacto no win rate final.
+* **CI** — workflow do GitHub Actions que corre `pytest` em cada push.
 
 ---
 

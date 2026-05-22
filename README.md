@@ -34,9 +34,10 @@ Portfolio completo das Práticas Laboratoriais (PL1–PL9) de Aprendizagem por R
 | **Dynamic Programming** | Policy Evaluation, Value Iteration, Policy Iteration | `agents/dp/` |
 | **Prediction** | First-Visit Monte Carlo, TD(0), TD(n) | `agents/prediction/` |
 | **Tabular Control** | SARSA, n-step SARSA, MC Control, Q-Learning | `agents/control/` (`q_learning.py`, `sarsa.py`, …) |
-| **Function Approximation** | Linear SARSA (NumPy), Torch SARSA (PyTorch) | `agents/control/` |
+| **Function Approximation** | Linear SARSA (NumPy), Torch SARSA (PyTorch), DQN (MLP 64×64 + replay + target net) | `agents/control/` |
 | **Policy Gradient** | REINFORCE (Monte Carlo policy gradient, entropy reg.) | `agents/control/reinforce.py` |
 | **Model-Based Planning** | MCTS (UCB1 selection, random rollout, backup) | `agents/planning/mcts.py` |
+| **MCTS + Neural Net** | AlphaZero-style (PUCT MCTS + policy/value net + self-play) | `agents/planning/alphazero.py` |
 
 ### Tic-Tac-Toe — Comparação de Algoritmos
 
@@ -199,6 +200,19 @@ python -m AR1.scripts.run_windy_gridworld_torch_sarsa --no-show
 
 # PL5: Windy Gridworld — Q-Learning (off-policy, comparável ao SARSA)
 python -m AR1.scripts.run_windy_gridworld_q_learning --no-show
+
+# Extra: DQN (MLP 64×64 + replay buffer + target net) vs Linear SARSA
+python -m AR1.scripts.run_windy_gridworld_dqn --no-show
+
+# Extra: AlphaZero-style (PUCT MCTS + policy/value net via self-play)
+python -m AR1.scripts.run_alphazero_tictactoe --no-show
+
+# Suite de benchmarks — corre algoritmos chave, mede métricas, gera JSON e gráficos
+python -m AR1.scripts.run_benchmarks --no-show
+# Resultados em outputs/benchmarks/{benchmarks.json, windy_summary.png, tictactoe_summary.png, ...}
+
+# Notebook unificado Random -> SARSA -> Q-Learning -> REINFORCE -> MCTS
+jupyter notebook notebooks/portfolio_demo.ipynb
 
 # PL6/PL7: Tic-Tac-Toe — SARSA vs Q-Learning
 python -m AR1.scripts.run_tictactoe --no-show
