@@ -212,7 +212,7 @@ python -m AR1.scripts.run_benchmarks --no-show
 # Resultados em outputs/benchmarks/{benchmarks.json, windy_summary.png, tictactoe_summary.png, ...}
 
 # Notebook unificado Random -> SARSA -> Q-Learning -> REINFORCE -> MCTS
-jupyter notebook notebooks/demo.ipynb
+jupyter notebook notebooks/portfolio_demo.ipynb
 
 # PL6/PL7: Tic-Tac-Toe — SARSA vs Q-Learning
 python -m AR1.scripts.run_tictactoe --no-show
@@ -258,4 +258,26 @@ PYTHONPATH=. pytest AR1/tests -q
 
 Cobertura por módulo:
 * `tests/test_envs.py` — KArmedBandit, Gridworld, GridworldTrap, transições estocásticas, Blackjack, Windy Gridworld, TicTacToe (24 testes).
-* `tests/test_agents.py` — 6 bandits, DP (Policy Eval, VI, PI), Predição (MC/TD/TDn), Controlo tabular (SARSA, Q-Learning, n-step SARSA, MC Control), Aproximação Linear, Features TicTacToe, REINFORC
+* `tests/test_agents.py` — 6 bandits, DP (Policy Eval, VI, PI), Predição (MC/TD/TDn), Controlo tabular (SARSA, Q-Learning, n-step SARSA, MC Control), Aproximação Linear, Features TicTacToe, REINFORCE, MCTS (30 testes).
+
+---
+
+## 📊 Análise de Resultados
+
+O ficheiro [`RESULTS.md`](RESULTS.md) contém uma discussão crítica completa das experiências:
+contextualização teórica de cada PL, resultados numéricos principais, comparações
+entre algoritmos e decisões técnicas transversais.
+
+---
+
+## 👤 Autor
+
+| Nome | Nº | Email |
+|------|----|-------|
+| Luís Miguel Pereira Silva | PG60390 | pg60390@alunos.uminho.pt |
+
+---
+
+## 📜 Licença
+
+Este trabalho é de cariz estritamente académico. Universidade do Minho, Escola de Engenharia, Departamento de Informática.
