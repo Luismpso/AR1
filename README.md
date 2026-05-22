@@ -1,16 +1,19 @@
 # 🎯 Reinforcement Learning — Portfolio
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![NumPy](https://img.shields.io/badge/NumPy-2.x-013243)
-![PyTorch](https://img.shields.io/badge/PyTorch-optional-EE4C2C)
-![Practices](https://img.shields.io/badge/Práticas-PL1--PL9-success)
-![Algorithms](https://img.shields.io/badge/Algoritmos-17+-purple)
-![Environments](https://img.shields.io/badge/Ambientes-5-orange)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C)
+![Práticas](https://img.shields.io/badge/Práticas-PL1--PL9-success)
+![Ambientes](https://img.shields.io/badge/Ambientes-5-orange)
+![Algoritmos](https://img.shields.io/badge/Algoritmos-20%2B-purple)
+![Tests](https://img.shields.io/badge/pytest-71%20passing-brightgreen)
+![Notebooks](https://img.shields.io/badge/Jupyter-2%20demos-F37626)
+![Deep RL](https://img.shields.io/badge/Deep%20RL-DQN%20%2B%20AlphaZero-9cf)
 ![License](https://img.shields.io/badge/License-Academic-lightgrey)
 
 > **Aprendizagem por Reforço** | Mestrado em Inteligência Artificial | Universidade do Minho | 2025/26
 
-Portfolio completo das Práticas Laboratoriais (PL1–PL9) de Aprendizagem por Reforço — inclui 5 ambientes, 18+ algoritmos (tabular, aproximação de função, policy gradient, self-play e planeamento model-based), 15 scripts executáveis e modo interativo para jogar contra os agentes treinados.
+Portefólio completo das Práticas Laboratoriais (PL1–PL9) de Aprendizagem por Reforço — inclui **5 ambientes**, **20+ algoritmos** (bandits, programação dinâmica, predição MC/TD/TD(n), controlo tabular SARSA/Q-Learning/n-step, aproximação linear, policy gradient REINFORCE, planeamento MCTS), **18 scripts executáveis**, **2 notebooks demonstrativos** (um com UI clicável para jogar contra o MCTS) e duas extensões deep RL: **DQN** no Windy Gridworld e **AlphaZero-style** no Tic-Tac-Toe (PUCT MCTS + rede política/valor treinada por self-play). Suite de **71 testes pytest** e **benchmarks reprodutíveis** com saída em JSON + gráficos.
 
 ---
 
