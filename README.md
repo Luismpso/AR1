@@ -1,19 +1,16 @@
 # 🎯 Reinforcement Learning — Portfolio
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![NumPy](https://img.shields.io/badge/NumPy-2.x-013243)
-![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C)
-![Práticas](https://img.shields.io/badge/Práticas-PL1--PL9-success)
-![Ambientes](https://img.shields.io/badge/Ambientes-5-orange)
-![Algoritmos](https://img.shields.io/badge/Algoritmos-20%2B-purple)
-![Tests](https://img.shields.io/badge/pytest-71%20passing-brightgreen)
-![Notebooks](https://img.shields.io/badge/Jupyter-2%20demos-F37626)
-![Deep RL](https://img.shields.io/badge/Deep%20RL-DQN%20%2B%20AlphaZero-9cf)
+![PyTorch](https://img.shields.io/badge/PyTorch-optional-EE4C2C)
+![Practices](https://img.shields.io/badge/Práticas-PL1--PL9-success)
+![Algorithms](https://img.shields.io/badge/Algoritmos-17+-purple)
+![Environments](https://img.shields.io/badge/Ambientes-5-orange)
 ![License](https://img.shields.io/badge/License-Academic-lightgrey)
 
 > **Aprendizagem por Reforço** | Mestrado em Inteligência Artificial | Universidade do Minho | 2025/26
 
-Portefólio completo das Práticas Laboratoriais (PL1–PL9) de Aprendizagem por Reforço — inclui **5 ambientes**, **20+ algoritmos** (bandits, programação dinâmica, predição MC/TD/TD(n), controlo tabular SARSA/Q-Learning/n-step, aproximação linear, policy gradient REINFORCE, planeamento MCTS), **18 scripts executáveis**, **2 notebooks demonstrativos** (um com UI clicável para jogar contra o MCTS) e duas extensões deep RL: **DQN** no Windy Gridworld e **AlphaZero-style** no Tic-Tac-Toe (PUCT MCTS + rede política/valor treinada por self-play). Suite de **71 testes pytest** e **benchmarks reprodutíveis** com saída em JSON + gráficos.
+Portfolio completo das Práticas Laboratoriais (PL1–PL9) de Aprendizagem por Reforço — inclui 5 ambientes, 18+ algoritmos (tabular, aproximação de função, policy gradient, self-play e planeamento model-based), 15 scripts executáveis e modo interativo para jogar contra os agentes treinados.
 
 ---
 
@@ -249,4 +246,42 @@ python -m AR1.scripts.run_mcts_tictactoe --play
 
 ---
 
-## ✅ Sui
+## ✅ Suite de Testes
+
+71 testes `pytest` (54 sem PyTorch + 17 com) cobrem ambientes e algoritmos — garantia de que as invariantes
+(forma das features, recompensas, dinâmica do vento, deteção de vitória, gradientes
+da política, etc.) se mantêm corretas após qualquer alteração.
+
+```bash
+# A partir da raiz do repositório (pasta-pai de AR1/):
+PYTHONPATH=. pytest AR1/tests -q
+# Esperado: "71 passed" (ou "54 passed, 17 skipped" se PyTorch não estiver instalado)
+```
+
+Cobertura por módulo:
+* `tests/test_envs.py` — KArmedBandit, Gridworld, GridworldTrap, transições estocásticas, Blackjack, Windy Gridworld, TicTacToe.
+* `tests/test_agents.py` — 6 bandits, DP (Policy Eval, VI, PI), Predição (MC/TD/TDn), Controlo tabular (SARSA, Q-Learning, n-step SARSA, MC Control), Aproximação Linear, Features TicTacToe, REINFORCE, MCTS.
+* `tests/test_dqn.py` — Deep Q-Network (rede, replay buffer, target net, ε-decay). Auto-*skip* se PyTorch não estiver instalado.
+* `tests/test_alphazero.py` — AlphaZero-style (rede política/valor, PUCT MCTS, *visit distribution*, treino). Auto-*skip* se PyTorch não estiver instalado.
+
+---
+
+## 📊 Análise de Resultados
+
+O ficheiro [`RESULTS.md`](RESULTS.md) contém uma discussão crítica completa das experiências:
+contextualização teórica de cada PL, resultados numéricos principais, comparações
+entre algoritmos e decisões técnicas transversais.
+
+---
+
+## 👤 Autor
+
+| Nome | Nº | Email |
+|------|----|-------|
+| Luís Miguel Pereira Silva | PG60390 | pg60390@alunos.uminho.pt |
+
+---
+
+## 📜 Licença
+
+Este trabalho é de cariz estritamente académico. Universidade do Minho, Escola de Engenharia, Departamento de Informática.
