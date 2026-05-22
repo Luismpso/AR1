@@ -43,3 +43,4 @@ htmlcov/
 # so outputs/ is NOT ignored. Uncomment the line below if you'd
 # rather regenerate them on demand.
 # outputs/**/*.png
+DEFESA.md

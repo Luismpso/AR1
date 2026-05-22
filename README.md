@@ -114,16 +114,22 @@ AR1/
 ├── notebooks/                  # Jupyter notebooks de demonstração
 │   └── tictactoe.ipynb             #   PL7+PL8+PL9: Random → REINFORCE → MCTS num único notebook
 │
-└── outputs/                    # Gráficos gerados
-    ├── bandits/                #   Epsilon study + battle of the bandits
-    ├── gridworld/              #   Policy eval, value iter, trap, stochastic, policy iter
-    ├── car_rental/             #   Policy iter + value iter (policy & value maps)
-    ├── blackjack_prediction/   #   MC vs TD(0) value surfaces
-    ├── blackjack_control/      #   MC Control vs SARSA policies & values
-    ├── windy_gridworld_*/      #   SARSA, n-step, MC, comparison, linear, torch
-    ├── tictactoe/              #   SARSA vs Q-Learning training & evaluation
-    ├── reinforce_tictactoe/    #   REINFORCE win rates, loss curve, eval summary
-    └── mcts_tictactoe/         #   MCTS vs random sweep, vs REINFORCE, vs MCTS
+├── tests/                     # Suite pytest (54 testes)
+│   ├── test_envs.py            #   PL1-PL9: invariantes dos ambientes (24 testes)
+│   └── test_agents.py          #   PL1-PL9: invariantes dos algoritmos (30 testes)
+│
+├── outputs/                    # Gráficos gerados
+│   ├── bandits/                #   Epsilon study + battle of the bandits
+│   ├── gridworld/              #   Policy eval, value iter, trap, stochastic, policy iter
+│   ├── car_rental/             #   Policy iter + value iter (policy & value maps)
+│   ├── blackjack_prediction/   #   MC vs TD(0) value surfaces
+│   ├── blackjack_control/      #   MC Control vs SARSA policies & values
+│   ├── windy_gridworld_*/      #   SARSA, n-step, MC, comparison, linear, torch
+│   ├── tictactoe/              #   SARSA vs Q-Learning training & evaluation
+│   ├── reinforce_tictactoe/    #   REINFORCE win rates, loss curve, eval summary
+│   └── mcts_tictactoe/         #   MCTS vs random sweep, vs REINFORCE, vs MCTS
+│
+└── RESULTS.md                  # Análise crítica dos resultados (PL1-PL9)
 ```
 
 ---
@@ -221,6 +227,32 @@ python -m AR1.scripts.run_mcts_tictactoe --play
 ```
 
 > Os gráficos são guardados em `AR1/outputs/`. Remover `--no-show` para exibir interativamente.
+
+---
+
+## ✅ Suite de Testes
+
+54 testes `pytest` cobrem ambientes e algoritmos — garantia de que as invariantes
+(forma das features, recompensas, dinâmica do vento, deteção de vitória, gradientes
+da política, etc.) se mantêm corretas após qualquer alteração.
+
+```bash
+# A partir da raiz do repositório (pasta-pai de AR1/):
+PYTHONPATH=. pytest AR1/tests -q
+# Esperado: "54 passed in ~30s"
+```
+
+Cobertura por módulo:
+* `tests/test_envs.py` — KArmedBandit, Gridworld, GridworldTrap, transições estocásticas, Blackjack, Windy Gridworld, TicTacToe (24 testes).
+* `tests/test_agents.py` — 6 bandits, DP (Policy Eval, VI, PI), Predição (MC/TD/TDn), Controlo tabular (SARSA, Q-Learning, n-step SARSA, MC Control), Aproximação Linear, Features TicTacToe, REINFORCE, MCTS (30 testes).
+
+---
+
+## 📊 Análise de Resultados
+
+O ficheiro [`RESULTS.md`](RESULTS.md) contém uma discussão crítica completa das experiências:
+contextualização teórica de cada PL, resultados numéricos principais, comparações
+entre algoritmos e decisões técnicas transversais.
 
 ---
 
