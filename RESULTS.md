@@ -10,7 +10,7 @@ gráficos estão em `outputs/<experiência>/` e podem ser regerados com os
 scripts em `scripts/run_*.py`.
 
 > **Reprodutibilidade.** Todos os scripts aceitam `--seed`. A suite
-> `pytest AR1/tests` (54 testes base + 18 testes em torch totalizando 72)
+> `pytest AR1/tests` (54 testes base + 17 testes torch = **71 totais**)
 > garante invariantes dos ambientes e algoritmos.
 
 ---
@@ -293,23 +293,26 @@ escalava para ResNets + milhões de self-play games.
 
 ### Suite de Testes (`tests/`)
 
-**72 testes pytest** (54 base + 8 DQN + 10 AlphaZero — estes últimos
+**71 testes pytest** (54 base + 17 testes em PyTorch — estes últimos
 auto-skip se torch não estiver instalado):
 
-* `test_envs.py` — 24 testes para KArmedBandit, Gridworld (deterministico,
+* `test_envs.py` — testes para KArmedBandit, Gridworld (deterministico,
   trap, estocástico), Blackjack, Windy Gridworld, TicTacToe.
-* `test_agents.py` — 30 testes para os 6 bandits, DP (PE/VI/PI),
+* `test_agents.py` — testes para os 6 bandits, DP (PE/VI/PI),
   predição (MC/TD/TDn), controlo tabular (SARSA, Q-Learning, n-step
   SARSA, MC Control), aproximação linear, features TicTacToe, REINFORCE,
   MCTS.
-* `test_dqn.py` — 8 testes (shape da rede, replay buffer, target sync,
-  ε-decay, treino).
-* `test_alphazero.py` — 10 testes (rede, PUCT, *visit distribution*,
-  iteração de treino).
+* `test_dqn.py` — testes do DQN: shape da rede, replay buffer, target
+  sync, ε-decay, treino. Auto-skip sem torch.
+* `test_alphazero.py` — testes do AlphaZero: rede política/valor, PUCT,
+  *visit distribution*, iteração de treino. Auto-skip sem torch.
 
 ```bash
-PYTHONPATH=. python -m pytest AR1/tests -q
-# Esperado: 72 passed in ~30s  (ou 54 passed, 18 skipped sem torch)
+# A partir da pasta-pai do AR1/:
+cd C:\Users\Luimp\Documents\github
+$env:PYTHONPATH = "."
+pytest AR1/tests -q
+# Esperado: 71 passed  (ou 54 passed, 17 skipped sem torch)
 ```
 
 ### Suite de Benchmarks (`scripts/run_benchmarks.py`)
@@ -370,53 +373,4 @@ tabelas acima.
 
 ---
 
-*Documento gerado para a submissão do portefólio individual (26/05/2026).*
-*Autor: Luís Miguel Pereira Silva (PG60390) · luimpsoo@gmail.com*
-ssárias para
-jogar bem: 32 simulações guiadas pela rede competem com 200+ simulações do
-MCTS clássico. A perda da política decai rapidamente porque a CE entre os
-visit counts do MCTS e a política da rede é um sinal de aprendizagem mais
-denso do que os returns Monte Carlo do REINFORCE.
-
-**Limitações desta versão didática:**
-* Apenas 4 iterações × 20 jogos — em comparação com AlphaZero no Go (milhões).
-  Suficiente para Tic-Tac-Toe porque o espaço de estados é minúsculo (~5478).
-* Sem evaluation gating (Silver et al. 2018 só substituía a rede após o
-  *challenger* vencer ≥55% dos jogos contra o *champion*).
-* Rede pequena demais para tarefas mais complexas — basta para 9 células,
-  mas para Go/Xadrez usar-se-ia uma ResNet com convoluções.
-
-Reprodução: `python -m AR1.scripts.run_alphazero_tictactoe --no-show`
-(requer PyTorch). Implementação em `agents/planning/alphazero.py`, validada por
-`tests/test_alphazero.py` (10 testes, *skip* automático sem torch).
-
----
-
-## Ferramentas de Avaliação Adicionadas
-
-**Suite de benchmarks (`scripts/run_benchmarks.py`).** Corre os algoritmos
-principais com um orçamento fixo, mede tempo de treino, episódios até
-convergir (sliding window de 20 com threshold de 20 passos) e
-métrica final (comprimento da política greedy ou win-rate), exporta tudo
-para `outputs/benchmarks/benchmarks.json` e gera três figuras de
-comparação (`windy_summary.png`, `tictactoe_summary.png`, `windy_curves.png`).
-Inclui Windy Gridworld (SARSA, Q-Learning, n-step SARSA) e Tic-Tac-Toe
-(Random, REINFORCE+baseline, MCTS).
-
-**Notebook unificado (`notebooks/portfolio_demo.ipynb`).** Walkthrough
-executável de 16 células que treina e compara, na mesma sessão e com a
-mesma função de avaliação, os algoritmos chave aplicados ao Tic-Tac-Toe:
-
-| Agente | Win Rate (X) | Win Rate (O) |
-|--------|:------------:|:------------:|
-| Random | ~58% | ~24% |
-| SARSA (5000 ep) | ~98% | ~70% |
-| Q-Learning (5000 ep) | ~98% | ~70% |
-| REINFORCE vanilla | ~78% | ~50% |
-| REINFORCE + baseline | ~96% | ~60% |
-| MCTS (200 sims) | **100%** | ~85% |
-
-O notebook termina com um gráfico empilhado win/draw/loss separado por
-papel (X / O) — visualização imediata da hierarquia entre algoritmos.
-
----
+*Documento gerado para 
