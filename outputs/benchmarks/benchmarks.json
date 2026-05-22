@@ -1,0 +1,59 @@
+{
+  "windy_gridworld": {
+    "sarsa": {
+      "training_time_s": 0.082,
+      "episodes_to_converge": 195,
+      "final_path_length": 100
+    },
+    "q_learning": {
+      "training_time_s": 0.078,
+      "episodes_to_converge": 146,
+      "final_path_length": 15
+    },
+    "n_step_sarsa": {
+      "training_time_s": 0.1,
+      "episodes_to_converge": 97,
+      "final_path_length": 20
+    }
+  },
+  "tictactoe": {
+    "random": {
+      "training_time_s": 0.0,
+      "episodes_to_converge": null,
+      "final_metric": {
+        "win_rate": 0.655,
+        "draw_rate": 0.1,
+        "loss_rate": 0.245
+      },
+      "_meta": "Uniform random vs uniform random; reported as X wins.",
+      "eval_time_s": 0.006
+    },
+    "reinforce_baseline": {
+      "training_time_s": 1.049,
+      "episodes_to_converge": null,
+      "final_metric": {
+        "win_rate": 0.7,
+        "draw_rate": 0.04,
+        "loss_rate": 0.26
+      },
+      "_meta": "REINFORCE with V(s) baseline; self-play + 30% vs random."
+    },
+    "mcts_200": {
+      "training_time_s": 0.0,
+      "episodes_to_converge": null,
+      "final_metric": {
+        "win_rate": 0.995,
+        "draw_rate": 0.005,
+        "loss_rate": 0.0
+      },
+      "_meta": "MCTS with 200 sims/move; no training. Reported time is evaluation wall-clock.",
+      "eval_time_s": 3.357
+    }
+  },
+  "_meta": {
+    "seed": 7,
+    "windy_episodes": 300,
+    "ttt_episodes": 2000,
+    "ttt_eval_games": 200
+  }
+}
