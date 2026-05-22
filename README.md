@@ -115,9 +115,11 @@ AR1/
 ├── notebooks/                  # Jupyter notebooks de demonstração
 │   └── tictactoe.ipynb             #   PL7+PL8+PL9: Random → REINFORCE → MCTS num único notebook
 │
-├── tests/                     # Suite pytest (54 testes)
-│   ├── test_envs.py            #   PL1-PL9: invariantes dos ambientes (24 testes)
-│   └── test_agents.py          #   PL1-PL9: invariantes dos algoritmos (30 testes)
+├── tests/                     # Suite pytest (71 testes; 54 sem torch + 17 com torch)
+│   ├── test_envs.py            #   PL1-PL9: invariantes dos ambientes
+│   ├── test_agents.py          #   PL1-PL9: invariantes dos algoritmos tabulares e lineares
+│   ├── test_dqn.py             #   PL6 (extra): DQN — auto-skip sem torch
+│   └── test_alphazero.py       #   PL9 (extra): AlphaZero — auto-skip sem torch
 │
 ├── outputs/                    # Gráficos gerados
 │   ├── bandits/                #   Epsilon study + battle of the bandits
@@ -246,19 +248,21 @@ python -m AR1.scripts.run_mcts_tictactoe --play
 
 ## ✅ Suite de Testes
 
-54 testes `pytest` cobrem ambientes e algoritmos — garantia de que as invariantes
+71 testes `pytest` (54 sem PyTorch + 17 com) cobrem ambientes e algoritmos — garantia de que as invariantes
 (forma das features, recompensas, dinâmica do vento, deteção de vitória, gradientes
 da política, etc.) se mantêm corretas após qualquer alteração.
 
 ```bash
 # A partir da raiz do repositório (pasta-pai de AR1/):
 PYTHONPATH=. pytest AR1/tests -q
-# Esperado: "54 passed in ~30s"
+# Esperado: "71 passed" (ou "54 passed, 17 skipped" se PyTorch não estiver instalado)
 ```
 
 Cobertura por módulo:
-* `tests/test_envs.py` — KArmedBandit, Gridworld, GridworldTrap, transições estocásticas, Blackjack, Windy Gridworld, TicTacToe (24 testes).
-* `tests/test_agents.py` — 6 bandits, DP (Policy Eval, VI, PI), Predição (MC/TD/TDn), Controlo tabular (SARSA, Q-Learning, n-step SARSA, MC Control), Aproximação Linear, Features TicTacToe, REINFORCE, MCTS (30 testes).
+* `tests/test_envs.py` — KArmedBandit, Gridworld, GridworldTrap, transições estocásticas, Blackjack, Windy Gridworld, TicTacToe.
+* `tests/test_agents.py` — 6 bandits, DP (Policy Eval, VI, PI), Predição (MC/TD/TDn), Controlo tabular (SARSA, Q-Learning, n-step SARSA, MC Control), Aproximação Linear, Features TicTacToe, REINFORCE, MCTS.
+* `tests/test_dqn.py` — Deep Q-Network (rede, replay buffer, target net, ε-decay). Auto-*skip* se PyTorch não estiver instalado.
+* `tests/test_alphazero.py` — AlphaZero-style (rede política/valor, PUCT MCTS, *visit distribution*, treino). Auto-*skip* se PyTorch não estiver instalado.
 
 ---
 

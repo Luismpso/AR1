@@ -10,7 +10,7 @@ gráficos estão em `outputs/<experiência>/` e podem ser regerados com os
 scripts em `scripts/run_*.py`.
 
 > **Reprodutibilidade.** Todos os scripts aceitam `--seed`. A suite
-> `pytest AR1/tests` (54 testes base + 18 testes em torch totalizando 72)
+> `pytest AR1/tests` (54 testes base + 17 testes torch = **71 totais**)
 > garante invariantes dos ambientes e algoritmos.
 
 ---
@@ -293,23 +293,26 @@ escalava para ResNets + milhões de self-play games.
 
 ### Suite de Testes (`tests/`)
 
-**72 testes pytest** (54 base + 8 DQN + 10 AlphaZero — estes últimos
+**71 testes pytest** (54 base + 17 testes em PyTorch — estes últimos
 auto-skip se torch não estiver instalado):
 
-* `test_envs.py` — 24 testes para KArmedBandit, Gridworld (deterministico,
+* `test_envs.py` — testes para KArmedBandit, Gridworld (deterministico,
   trap, estocástico), Blackjack, Windy Gridworld, TicTacToe.
-* `test_agents.py` — 30 testes para os 6 bandits, DP (PE/VI/PI),
+* `test_agents.py` — testes para os 6 bandits, DP (PE/VI/PI),
   predição (MC/TD/TDn), controlo tabular (SARSA, Q-Learning, n-step
   SARSA, MC Control), aproximação linear, features TicTacToe, REINFORCE,
   MCTS.
-* `test_dqn.py` — 8 testes (shape da rede, replay buffer, target sync,
-  ε-decay, treino).
-* `test_alphazero.py` — 10 testes (rede, PUCT, *visit distribution*,
-  iteração de treino).
+* `test_dqn.py` — testes do DQN: shape da rede, replay buffer, target
+  sync, ε-decay, treino. Auto-skip sem torch.
+* `test_alphazero.py` — testes do AlphaZero: rede política/valor, PUCT,
+  *visit distribution*, iteração de treino. Auto-skip sem torch.
 
 ```bash
-PYTHONPATH=. python -m pytest AR1/tests -q
-# Esperado: 72 passed in ~30s  (ou 54 passed, 18 skipped sem torch)
+# A partir da pasta-pai do AR1/:
+cd C:\Users\Luimp\Documents\github
+$env:PYTHONPATH = "."
+pytest AR1/tests -q
+# Esperado: 71 passed  (ou 54 passed, 17 skipped sem torch)
 ```
 
 ### Suite de Benchmarks (`scripts/run_benchmarks.py`)
