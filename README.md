@@ -115,11 +115,9 @@ AR1/
 ├── notebooks/                  # Jupyter notebooks de demonstração
 │   └── tictactoe.ipynb             #   PL7+PL8+PL9: Random → REINFORCE → MCTS num único notebook
 │
-├── tests/                     # Suite pytest (71 testes; 54 sem torch + 17 com torch)
-│   ├── test_envs.py            #   PL1-PL9: invariantes dos ambientes
-│   ├── test_agents.py          #   PL1-PL9: invariantes dos algoritmos tabulares e lineares
-│   ├── test_dqn.py             #   PL6 (extra): DQN — auto-skip sem torch
-│   └── test_alphazero.py       #   PL9 (extra): AlphaZero — auto-skip sem torch
+├── tests/                     # Suite pytest (54 testes)
+│   ├── test_envs.py            #   PL1-PL9: invariantes dos ambientes (24 testes)
+│   └── test_agents.py          #   PL1-PL9: invariantes dos algoritmos (30 testes)
 │
 ├── outputs/                    # Gráficos gerados
 │   ├── bandits/                #   Epsilon study + battle of the bandits
@@ -248,15 +246,38 @@ python -m AR1.scripts.run_mcts_tictactoe --play
 
 ## ✅ Suite de Testes
 
-71 testes `pytest` (54 sem PyTorch + 17 com) cobrem ambientes e algoritmos — garantia de que as invariantes
+54 testes `pytest` cobrem ambientes e algoritmos — garantia de que as invariantes
 (forma das features, recompensas, dinâmica do vento, deteção de vitória, gradientes
 da política, etc.) se mantêm corretas após qualquer alteração.
 
 ```bash
 # A partir da raiz do repositório (pasta-pai de AR1/):
 PYTHONPATH=. pytest AR1/tests -q
-# Esperado: "71 passed" (ou "54 passed, 17 skipped" se PyTorch não estiver instalado)
+# Esperado: "54 passed in ~30s"
 ```
 
 Cobertura por módulo:
-* `tests/test_envs.py` — KArmedBandit, Gridworld, GridworldTrap,
+* `tests/test_envs.py` — KArmedBandit, Gridworld, GridworldTrap, transições estocásticas, Blackjack, Windy Gridworld, TicTacToe (24 testes).
+* `tests/test_agents.py` — 6 bandits, DP (Policy Eval, VI, PI), Predição (MC/TD/TDn), Controlo tabular (SARSA, Q-Learning, n-step SARSA, MC Control), Aproximação Linear, Features TicTacToe, REINFORCE, MCTS (30 testes).
+
+---
+
+## 📊 Análise de Resultados
+
+O ficheiro [`RESULTS.md`](RESULTS.md) contém uma discussão crítica completa das experiências:
+contextualização teórica de cada PL, resultados numéricos principais, comparações
+entre algoritmos e decisões técnicas transversais.
+
+---
+
+## 👤 Autor
+
+| Nome | Nº | Email |
+|------|----|-------|
+| Luís Miguel Pereira Silva | PG60390 | pg60390@alunos.uminho.pt |
+
+---
+
+## 📜 Licença
+
+Este trabalho é de cariz estritamente académico. Universidade do Minho, Escola de Engenharia, Departamento de Informática.
