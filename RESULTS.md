@@ -276,57 +276,18 @@ done
 
 ---
 
-## Extensão Extra — DQN no Windy Gridworld
+## Próximos Passos (se houvesse tempo)
 
-**Algoritmo:** Deep Q-Network (Mnih et al., 2015) com replay buffer e
-target network. Arquitetura: MLP `(2 → 64 → 64 → 4)` com ReLU. Input:
-`(row, col)` normalizado para `[0, 1]²`. Treino: Adam (lr=5e-4), batch 32,
-replay buffer 10k, warmup 200 passos, target sync a cada 100 updates,
-ε de 1.0 → 0.05 ao longo de 5000 passos, gradient clipping a 10.0.
-
-**Comparação direta com Linear SARSA** (mesmo número de episódios, mesmo
-ambiente, mesma semente — `outputs/windy_gridworld_dqn/`):
-
-| Critério | Linear SARSA (tile coding) | DQN (MLP 64×64) |
-|----------|----------------------------|-----------------|
-| Features de entrada | 384-dim (sparse, tile coding) | 2-dim (densa, normalizada) |
-| Parâmetros aprendidos | ≈ 384 (lineares) | ≈ 4 800 (não-lineares) |
-| Convergência típica | rápida (~50 ep) | mais lenta (~200 ep) |
-| Estabilidade | muito estável | requer target net + clipping |
-| Comprimento da política greedy | ~17 passos | ~17 passos (após convergir) |
-
-**Discussão.** O DQN aprende *sem features manuais* — demonstra a abstração
-end-to-end típica do deep RL. Em troca paga em **amostras necessárias** e
-em **complexidade de treino** (replay buffer, target net, gradient clipping).
-Para um problema deste tamanho, Linear SARSA com tile coding ganha
-claramente em *sample efficiency*; o DQN brilha quando o espaço de estados
-é demasiado grande para tile coding ser viável (continuous control,
-imagens, etc.).
-
-**Lições técnicas demonstradas:**
-* O target network estabiliza o alvo TD evitando a "perseguição do próprio
-  rabo" que apareceria se a mesma rede gerasse Q(s, a) e max Q(s', ·).
-* O replay buffer descorrelaciona transições consecutivas — sem ele, o
-  treino oscila.
-* O épsilon decay (1.0 → 0.05) força exploração no início e
-  explora-exploitation no final.
-
-Reprodução: `python -m AR1.scripts.run_windy_gridworld_dqn --no-show`
-(requer PyTorch). Implementação em `agents/control/dqn.py`, validada por
-`tests/test_dqn.py` (8 testes, *skip* automático quando torch não está
-instalado).
+* **DQN no Windy Gridworld** — substituir Linear SARSA por uma rede pequena
+  (2 camadas × 64) e comparar curvas de aprendizagem.
+* **AlphaZero-style** — combinar MCTS com uma rede de políticas/valor
+  treinada por self-play no Tic-Tac-Toe.
+* **Suite de benchmarks** — registar tempo, episódios para convergir, e
+  win-rate final num JSON, gerar gráficos comparativos automaticamente.
+* **Notebook único de demonstração** — agregar Random → SARSA → Q-Learning →
+  REINFORCE → MCTS num único Jupyter notebook executável (já existe
+  parcialmente em `notebooks/tictactoe.ipynb`).
 
 ---
 
-## Extensão Extra — AlphaZero-style no Tic-Tac-Toe
-
-**Algoritmo:** reprodução em miniatura do AlphaZero (Silver et al., 2017/2018).
-Não é uma reimplementação completa — é o algoritmo *do mesmo molde* aplicado a
-um jogo solúvel para que se possam observar todas as peças a funcionar dentro
-de um orçamento razoável.
-
-**Componentes:**
-
-* **Rede política+valor** — MLP único `27 → 64 → 64` com dois "heads":
-  política `Linear(64, 9)` (9 logits, um por célula) e valor `Linear(64, 1) → tanh`
-  com saída em `[-1, +1]`. Input: `encode_state(board, current_player)` (mesm
+*Documento gerado para a submissão do portefólio individual (26/05/2026).*
