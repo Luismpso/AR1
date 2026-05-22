@@ -212,7 +212,7 @@ python -m AR1.scripts.run_benchmarks --no-show
 # Resultados em outputs/benchmarks/{benchmarks.json, windy_summary.png, tictactoe_summary.png, ...}
 
 # Notebook unificado Random -> SARSA -> Q-Learning -> REINFORCE -> MCTS
-jupyter notebook notebooks/portfolio_demo.ipynb
+jupyter notebook notebooks/demo.ipynb
 
 # PL6/PL7: Tic-Tac-Toe — SARSA vs Q-Learning
 python -m AR1.scripts.run_tictactoe --no-show
