@@ -113,143 +113,120 @@ def play_game_vs_human(
             
     return result
 
+
 # ── Interactive widget-based human play (Jupyter only) ───────────────────────
 
 def play_game_vs_human_widget(
-    env: TicTacToeEnv,
-    agent_policy: Policy,
+    env,
+    agent_policy,
     human_starts: bool = True,
     agent_label: str = "Agent",
-    figsize: tuple[float, float] = (4.5, 4.5),
 ):
-    """Interactive Tic-Tac-Toe: click a cell to play, the agent replies.
+    """Interactive Tic-Tac-Toe inside a Jupyter notebook (ipywidgets only).
 
-    Designed for Jupyter notebooks.  Renders the 3x3 board with matplotlib
-    and exposes one ipywidgets Button per empty cell so the human plays by
-    clicking the cell where they want to place their mark.  After every
-    human move the agent ``agent_policy(env, state)`` is invoked, and the
-    board is redrawn.
+    A 3x3 grid of buttons IS the board: each button shows the cell number
+    while empty, an X / O once played.  Click a cell to play; the agent
+    responds immediately and the board is redrawn.  No matplotlib backend,
+    no extra dependencies beyond the ipywidgets that ship with Jupyter.
 
     Args:
         env:           a :class:`TicTacToeEnv` instance.
         agent_policy:  callable ``(env, state) -> action`` for the AI side.
         human_starts:  ``True`` if the human plays X (first); ``False`` for O.
-        agent_label:   label used in the status messages (e.g. ``"MCTS"``).
-        figsize:       matplotlib figure size for the board.
+        agent_label:   label used in status messages (e.g. ``"MCTS"``).
     """
     import ipywidgets as widgets
-    import matplotlib.pyplot as plt
     from IPython.display import display
 
     human_player = 1 if human_starts else -1
+    env.reset()
 
-    state = env.reset()
-
-    # ── matplotlib board ───────────────────────────────────────────────────
-    fig, ax = plt.subplots(figsize=figsize)
-    fig.canvas.toolbar_visible = False
-    fig.canvas.header_visible = False
-
-    def _draw():
-        ax.clear()
-        ax.set_xlim(-0.05, 3.05); ax.set_ylim(-0.05, 3.05)
-        ax.set_xticks([]); ax.set_yticks([])
-        ax.set_aspect("equal")
-        # Grid
-        for i in (1, 2):
-            ax.plot([0, 3], [i, i], color="#444", lw=2)
-            ax.plot([i, i], [0, 3], color="#444", lw=2)
-        # Outer border
-        for s in ax.spines.values():
-            s.set_color("#444"); s.set_linewidth(2)
-        # Pieces
-        for idx, v in enumerate(env.board):
-            r, c = divmod(idx, 3)
-            cx, cy = c + 0.5, 2.5 - r       # rows numbered top to bottom
-            if v == 1:
-                ax.plot([cx - 0.3, cx + 0.3], [cy - 0.3, cy + 0.3], color="#1e88e5", lw=4)
-                ax.plot([cx - 0.3, cx + 0.3], [cy + 0.3, cy - 0.3], color="#1e88e5", lw=4)
-            elif v == -1:
-                circle = plt.Circle((cx, cy), 0.32, fill=False, color="#e53935", lw=4)
-                ax.add_patch(circle)
-            else:
-                ax.text(cx, cy, str(idx), ha="center", va="center",
-                        color="#aaa", fontsize=22, fontweight="bold")
-        fig.canvas.draw_idle()
-
-    out = widgets.Output()
-    status_label = widgets.HTML(value="<b>Carrega numa célula para jogar.</b>")
-
-    # ── click buttons (one per cell) ───────────────────────────────────────
+    # ── State holders ─────────────────────────────────────────────────
+    finished = {"flag": False}
+    status_label = widgets.HTML()
     cell_buttons = [
-        widgets.Button(description=str(i), layout=widgets.Layout(width="60px", height="60px"))
-        for i in range(9)
+        widgets.Button(layout=widgets.Layout(width="70px", height="70px"))
+        for _ in range(9)
     ]
     grid = widgets.GridBox(
         cell_buttons,
-        layout=widgets.Layout(grid_template_columns="repeat(3, 60px)", grid_gap="4px"),
+        layout=widgets.Layout(
+            grid_template_columns="repeat(3, 70px)",
+            grid_gap="6px",
+        ),
     )
-
     new_game_btn = widgets.Button(description="Novo jogo", button_style="info")
 
-    finished = {"flag": False}
-
-    def _sync_buttons():
-        legal = set(env.available_actions(env.board)) if not finished["flag"] else set()
+    # ── Render helpers ────────────────────────────────────────────────
+    def _render():
         for idx, b in enumerate(cell_buttons):
-            b.disabled = (idx not in legal)
-            # cosmetic label: piece if filled, else cell number
             v = env.board[idx]
-            b.description = "X" if v == 1 else ("O" if v == -1 else str(idx))
+            if v == 1:
+                b.description = "X"
+                b.button_style = "primary"            # blue
+                b.disabled = True
+            elif v == -1:
+                b.description = "O"
+                b.button_style = "danger"             # red
+                b.disabled = True
+            else:
+                b.description = str(idx)
+                b.button_style = ""
+                b.disabled = finished["flag"]
 
     def _announce_outcome():
         w = _winner(env.board)
         if w == human_player:
-            status_label.value = "<b style='color:#2e7d32'>Ganhaste!</b>"
+            status_label.value = "<b style='color:#2e7d32; font-size:18px'>Ganhaste!</b>"
         elif w == -human_player:
-            status_label.value = f"<b style='color:#c62828'>{agent_label} venceu.</b>"
+            status_label.value = (
+                f"<b style='color:#c62828; font-size:18px'>{agent_label} venceu.</b>"
+            )
         else:
-            status_label.value = "<b style='color:#ef6c00'>Empate.</b>"
+            status_label.value = "<b style='color:#ef6c00; font-size:18px'>Empate.</b>"
+
+    def _check_end_after_move() -> bool:
+        if env.is_terminal(env.board):
+            finished["flag"] = True
+            _announce_outcome()
+            _render()
+            return True
+        return False
 
     def _agent_turn():
-        if env.is_terminal(env.board):
-            finished["flag"] = True
-            _announce_outcome(); _sync_buttons(); _draw()
+        if finished["flag"] or env.is_terminal(env.board):
             return
-        status_label.value = f"<i>{agent_label} a pensar…</i>"
-        with out:
-            action = agent_policy(env, env.board)
+        status_label.value = f"<i>{agent_label} a pensar...</i>"
+        action = agent_policy(env, env.board)
         env.step(action)
-        _draw()
-        if env.is_terminal(env.board):
-            finished["flag"] = True
-            _announce_outcome(); _sync_buttons()
+        _render()
+        if _check_end_after_move():
             return
         status_label.value = "<b>A tua vez.</b>"
-        _sync_buttons()
 
     def _on_click(b):
         if finished["flag"]:
             return
-        action = int(b.description) if b.description.isdigit() else None
-        if action is None or env.board[action] != 0:
+        try:
+            action = int(b.description)
+        except (TypeError, ValueError):
+            return
+        if env.board[action] != 0:
             return
         env.step(action)
-        _draw()
-        if env.is_terminal(env.board):
-            finished["flag"] = True
-            _announce_outcome(); _sync_buttons()
+        _render()
+        if _check_end_after_move():
             return
-        _sync_buttons()
         _agent_turn()
 
-    def _on_new_game(b):
+    def _on_new_game(_):
         env.reset()
         finished["flag"] = False
         status_label.value = (
-            "<b>A tua vez.</b>" if human_starts else f"<i>{agent_label} a começar…</i>"
+            "<b>A tua vez.</b>" if human_starts
+            else f"<i>{agent_label} a comecar...</i>"
         )
-        _draw(); _sync_buttons()
+        _render()
         if not human_starts:
             _agent_turn()
 
@@ -257,14 +234,13 @@ def play_game_vs_human_widget(
         b.on_click(_on_click)
     new_game_btn.on_click(_on_new_game)
 
-    # ── initial render ────────────────────────────────────────────────────
-    _draw(); _sync_buttons()
+    # ── Initial render ────────────────────────────────────────────────
+    status_label.value = (
+        "<b>A tua vez.</b>" if human_starts
+        else f"<i>{agent_label} a comecar...</i>"
+    )
+    _render()
     if not human_starts:
-        # If the agent goes first, fire its move immediately.
-        # (status_label.value will be updated inside _agent_turn)
         _agent_turn()
 
-    display(widgets.VBox([
-        widgets.HBox([fig.canvas, widgets.VBox([status_label, grid, new_game_btn])]),
-        out,
-    ]))
+    display(widgets.VBox([status_label, grid, new_game_btn]))
