@@ -1,4 +1,4 @@
-# 🎯 Reinforcement Learning — Portfolio
+# 🎯 Portfólio de Aprendizagem por Reforço
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![NumPy](https://img.shields.io/badge/NumPy-2.x-013243)
