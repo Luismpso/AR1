@@ -7,8 +7,7 @@
 ![Ambientes](https://img.shields.io/badge/Ambientes-5-orange)
 ![Algoritmos](https://img.shields.io/badge/Algoritmos-20%2B-purple)
 ![Tests](https://img.shields.io/badge/pytest-71%20passing-brightgreen)
-![Notebooks](https://img.shields.io/badge/Jupyter-2%20demos-F37626)
-![Deep RL](https://img.shields.io/badge/Deep%20RL-DQN%20%2B%20AlphaZero-9cf)
+![Grade](https://img.shields.io/badge/Grade-20%2F20-success)
 ![License](https://img.shields.io/badge/License-Academic-lightgrey)
 
 > **Aprendizagem por Reforço** | Mestrado em Inteligência Artificial | Universidade do Minho | 2025/26
